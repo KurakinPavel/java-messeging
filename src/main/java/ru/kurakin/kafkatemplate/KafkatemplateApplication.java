@@ -9,5 +9,4 @@ public class KafkatemplateApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(KafkatemplateApplication.class, args);
 	}
-
 }
