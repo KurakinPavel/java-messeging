@@ -16,7 +16,7 @@ import ru.kurakin.repository.UserRepository;
 public class Consumer {
     private final UserRepository repository;
 
-    @KafkaListener(topics = {"knowledgeFactory_Topic"}, groupId = "knowledgeFactory_Topic")
+    @KafkaListener(topics = {"${kafka.topic.name}"}, groupId = "${kafka.topic.name}")
     public void listenToTopic(@Payload String us) throws JsonProcessingException {
         User user = new ObjectMapper().readValue(us, User.class);
         repository.save(user);
