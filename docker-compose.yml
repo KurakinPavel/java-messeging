@@ -41,7 +41,7 @@ services:
       - db
     environment:
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - spring.kafka.consumer.group-id=knowledgeFactory_Topic
+      - spring.kafka.consumer.group-id=async
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/kafka_demo_db
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
