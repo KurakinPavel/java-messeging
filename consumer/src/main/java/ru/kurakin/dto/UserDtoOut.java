@@ -1,15 +1,18 @@
-package ru.kurakin.model;
+package ru.kurakin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+@ToString
+public class UserDtoOut {
+    protected int id;
     protected String name;
     protected String email;
 }
