@@ -16,10 +16,10 @@ import ru.kurakin.repository.UserRepository;
 public class Consumer {
     private final UserRepository repository;
 
-    @KafkaListener(topics = {"${kafka.topic.name}"}, groupId = "${kafka.topic.name}")
+    @KafkaListener(topics = {"knowledgeFactory_Topic"}, groupId = "knowledgeFactory_Topic")
     public void listenToTopic(@Payload String us) throws JsonProcessingException {
         User user = new ObjectMapper().readValue(us, User.class);
         repository.save(user);
-        log.info("Юзер сохранён");
+        log.info("Сохранённая сущность: {}", user);
     }
 }

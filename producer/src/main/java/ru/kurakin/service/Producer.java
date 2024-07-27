@@ -9,7 +9,7 @@ import ru.kurakin.model.User;
 public class Producer {
     KafkaTemplate<String, User> kafkaTemplate;
 
-    @Value("knowledgeFactory_Topic")
+    @Value("${kafka.topic.name}")
     private String topic;
 
     public Producer(KafkaTemplate<String, User> kafkaTemplate) {
