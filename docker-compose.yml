@@ -1,26 +1,13 @@
 version: '3.8'
 services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+  rabbitmq:
+    image: rabbitmq:3.13.6-alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+    container_name: rabbitmq
     ports:
-      - 22181:2181
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - 29092:29092
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      - 15672:15672
+      - 5672:5672
 
   producer:
     build: ./producer
@@ -29,7 +16,13 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
 
   consumer:
     build: ./consumer
@@ -38,20 +31,27 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - db
+      rabbitmq:
+        condition: service_healthy
+      producer:
+        condition: service_started
+      db:
+        condition: service_started
     environment:
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-      - spring.kafka.consumer.group-id=knowledgeFactory_Topic
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/kafka_demo_db
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/rabbitmq_demo_db
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=root
 
   db:
     image: postgres:13.7-alpine
-    container_name: kafka-demo-db
+    container_name: rabbitmq-demo-db
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=kafka_demo_db
+      - POSTGRES_DB=rabbitmq_demo_db
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
