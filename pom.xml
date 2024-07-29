@@ -9,11 +9,11 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.kurakin</groupId>
-	<artifactId>kafkatemplate</artifactId>
+	<artifactId>rabbitmq</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>kafkatemplate</name>
-	<description>Demo project for Spring Boot and Kafka Template</description>
+	<name>rabbitmq</name>
+	<description>Demo project for Spring Boot and RabbitMQ</description>
 	<modules>
 		<module>producer</module>
 		<module>consumer</module>
@@ -53,6 +53,12 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.amqp</groupId>
+			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 

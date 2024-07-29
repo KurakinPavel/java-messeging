@@ -1,5 +1,6 @@
 package ru.kurakin.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,8 +16,8 @@ public class UserController {
     private final Producer producer;
 
     @PostMapping("/sendToDB")
-    public String saveUser(@RequestBody User user) {
-        producer.sendMessageToTopic(user);
+    public String saveUser(@RequestBody User user) throws JsonProcessingException {
+        producer.sendUserToTopic(user);
         return "User was sent successfully";
     }
 }

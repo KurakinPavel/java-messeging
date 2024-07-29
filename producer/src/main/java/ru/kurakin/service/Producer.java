@@ -1,22 +1,30 @@
 package ru.kurakin.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.kurakin.model.User;
 
 @Service
 public class Producer {
-    KafkaTemplate<String, User> kafkaTemplate;
 
-    @Value("${kafka.topic.name}")
-    private String topic;
+    @Value("${rabbitmq.exchange.name}")
+    private String exchange;
 
-    public Producer(KafkaTemplate<String, User> kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
-    public void sendMessageToTopic(User user) {
-        kafkaTemplate.send(topic, user);
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    public void sendUserToTopic(User user) throws JsonProcessingException {
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(user);
+        rabbitTemplate.convertAndSend(
+                exchange, routingKey, json);
     }
 }

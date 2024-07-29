@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.kurakin</groupId>
-        <artifactId>kafkatemplate</artifactId>
+        <artifactId>rabbitmq</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
