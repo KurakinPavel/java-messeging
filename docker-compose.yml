@@ -1,0 +1,57 @@
+version: '3.8'
+services:
+  rabbitmq:
+    image: rabbitmq:3.13.6-alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+    container_name: rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  producer:
+    build: ./producer
+    image: producer-image
+    container_name: producer
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  consumer:
+    build: ./consumer
+    image: consumer-image
+    container_name: consumer
+    ports:
+      - "9090:9090"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      producer:
+        condition: service_started
+      db:
+        condition: service_started
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/rabbitmq_demo_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+
+  db:
+    image: postgres:13.7-alpine
+    container_name: rabbitmq-demo-db
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=rabbitmq_demo_db
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
